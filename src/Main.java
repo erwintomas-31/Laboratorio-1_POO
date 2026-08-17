@@ -1,12 +1,6 @@
-import controller.Combate;
-import model.Digievolucion;
-import model.Digimon;
-import model.Entrenador;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
-
 
 public class Main {
     private Scanner scanner;
@@ -26,13 +20,32 @@ public class Main {
         List<Digimon> catalogo = crearCatalogo();
         mostrarCatalogo(catalogo);
 
-        Entrenador entrenador1 = new Entrenador(leerTexto("\nNombre del entrenador 1: "));
+        Entrenador entrenador1 = new Entrenador(leerTexto("Nombre del entrenador 1: "));
         Entrenador entrenador2 = new Entrenador(leerTexto("Nombre del entrenador 2: "));
 
         registrarEntrenadores(entrenador1, entrenador2, catalogo);
 
         Combate combate = new Combate(entrenador1, entrenador2, this);
         combate.iniciarBatalla();
+
+        for (int ronda = 1; ronda <= 4; ronda++) {
+            mostrarMensaje("RONDA " + ronda);
+
+            mostrarMensaje("Turno de " + entrenador1.getNombre());
+            Digimon d1 = elegirDigimonRonda(entrenador1);
+            boolean usoHab1 = preguntarUsoHabilidad(d1);
+
+            mostrarMensaje("Turno de " + entrenador2.getNombre());
+            Digimon d2 = elegirDigimonRonda(entrenador2);
+            boolean usoHab2 = preguntarUsoHabilidad(d2);
+
+            String resultado = combate.ejecutarRonda(d1, usoHab1, d2, usoHab2);
+            mostrarResultadoRonda(resultado);
+            mostrarMarcador(entrenador1, entrenador2);
+        }
+
+        Entrenador ganador = combate.determinarGanadorFinal();
+        mostrarGanadorFinal(ganador, entrenador1, entrenador2);
 
         scanner.close();
     }
@@ -41,30 +54,31 @@ public class Main {
         List<Digimon> catalogo = new ArrayList<>();
 
         catalogo.add(new Digimon("Agumon", "Fuego", 50, 30,
-                new Digievolución("Greymon", "ataque", 15, 40)));
+                new Digievolucion("Greymon", "ataque", 15, 40)));
         catalogo.add(new Digimon("Gabumon", "Planta", 45, 35,
-                new Digievolución("Garurumon", "defensa", 10, 35)));
+                new Digievolucion("Garurumon", "defensa", 10, 35)));
         catalogo.add(new Digimon("Gomamon", "Agua", 40, 40,
-                new Digievolución("Ikkakumon", "ataque", 20, 30)));
-        catalogo.add(new Digimon("Patamon", "Electrico", 42, 32, new Digievolucion("Angemon", "dano", 10, 45)));
+                new Digievolucion("Ikkakumon", "ataque", 20, 30)));
+        catalogo.add(new Digimon("Patamon", "Electrico", 42, 32, 
+                new Digievolucion("Angemon", "dano", 10, 45)));
         catalogo.add(new Digimon("Palmon", "Planta", 38, 38,
-                new Digievolución("Togemon", "ataque", 12, 50)));
+                new Digievolucion("Togemon", "ataque", 12, 50)));
         catalogo.add(new Digimon("Biyomon", "Fuego", 48, 28,
-                new Digievolución("Birdramon", "dano", 15, 30)));
+                new Digievolucion("Birdramon", "dano", 15, 30)));
         catalogo.add(new Digimon("Tentomon", "Electrico", 44, 36,
-                new Digievolución("Kabuterimon", "ataque", 18, 25)));
+                new Digievolucion("Kabuterimon", "ataque", 18, 25)));
         catalogo.add(new Digimon("Betamon", "Agua", 46, 30,
-                new Digievolución("Seadramon", "defensa", 15, 40)));
+                new Digievolucion("Seadramon", "defensa", 15, 40)));
 
         return catalogo;
     }
 
     public void registrarEntrenadores(Entrenador entrenador1, Entrenador entrenador2, List<Digimon> catalogo) {
-        mostrarMensaje("\n" + entrenador1.getNombre() + ", elige 4 Digimon (uno por uno):");
+        mostrarMensaje(entrenador1.getNombre() + ", elige 4 Digimon (uno por uno):");
         entrenador1.elegirEquipo(seleccionarCuatroDigimon(catalogo));
         mostrarEquipoSeleccionado(entrenador1);
 
-        mostrarMensaje("\n" + entrenador2.getNombre() + ", elige 4 Digimon (uno por uno):");
+        mostrarMensaje(entrenador2.getNombre() + ", elige 4 Digimon (uno por uno):");
         entrenador2.elegirEquipo(seleccionarCuatroDigimon(catalogo));
         mostrarEquipoSeleccionado(entrenador2);
     }
@@ -87,9 +101,9 @@ public class Main {
 
     public boolean preguntarUsoHabilidad(Digimon digimon) {
         System.out.print("Quieres usar la habilidad especial de " + digimon.getNombre()
-                + " (" + digimon.getDigievolución().getNombre() + ")? (s/n): ");
+                + " (" + digimon.getDigievolución().getNombre() + ")?");
         String respuesta = scanner.next();
-        return respuesta.equalsIgnoreCase("s");
+        return respuesta.equalsIgnoreCase("si");
     }
 
     private List<Digimon> seleccionarCuatroDigimon(List<Digimon> catalogo) {
@@ -127,32 +141,30 @@ public class Main {
     }
 
     public void mostrarBienvenida() {
-        System.out.println("==========================================");
         System.out.println("   BATALLA DIGIMON - 4 RONDAS");
-        System.out.println("==========================================");
     }
 
     public void mostrarCatalogo(List<Digimon> catalogo) {
-        System.out.println("\nDigimon disponibles:");
+        System.out.println("Digimon disponibles:");
         for (int i = 0; i < catalogo.size(); i++) {
             Digimon d = catalogo.get(i);
             System.out.println((i + 1) + ". " + d + " | Digievolucion: "
                     + d.getDigievolución().getNombre()
                     + " (" + d.getDigievolución().getTipoEfecto()
                     + " " + d.getDigievolución().getValorEfecto()
-                    + ", " + d.getDigievolución().getProbabilidad() + "% prob.)");
+                    + ", " + d.getDigievolución().getProbabilidad() + "% probabilidad)");
         }
     }
 
     public void mostrarEquipoSeleccionado(Entrenador entrenador) {
-        System.out.println("\nEquipo de " + entrenador.getNombre() + ":");
+        System.out.println("Equipo de " + entrenador.getNombre() + ":");
         for (Digimon d : entrenador.getEquipo()) {
             System.out.println("  - " + d);
         }
     }
 
     public void mostrarDigimonDisponiblesEntrenador(Entrenador entrenador) {
-        System.out.println("\nDigimon disponibles de " + entrenador.getNombre() + ":");
+        System.out.println("Digimon disponibles de " + entrenador.getNombre() + ":");
         List<Digimon> equipo = entrenador.getEquipo();
         for (int i = 0; i < equipo.size(); i++) {
             Digimon d = equipo.get(i);
@@ -163,24 +175,22 @@ public class Main {
     }
 
     public void mostrarResultadoRonda(String resultado) {
-        System.out.println("\n" + resultado);
+        System.out.println(resultado);
     }
 
     public void mostrarMarcador(Entrenador e1, Entrenador e2) {
-        System.out.println("Marcador -> " + e1.getNombre() + ": " + e1.getRondasGanadas()
+        System.out.println("Marcador: " + e1.getNombre() + ": " + e1.getRondasGanadas()
                 + " | " + e2.getNombre() + ": " + e2.getRondasGanadas());
     }
 
     public void mostrarGanadorFinal(Entrenador ganador, Entrenador e1, Entrenador e2) {
-        System.out.println("\n==========================================");
         if (ganador == null) {
-            System.out.println("RESULTADO FINAL: EMPATE");
+            System.out.println("Resultado final: EMPATE");
         } else {
-            System.out.println("GANADOR DE LA BATALLA: " + ganador.getNombre());
+            System.out.println("Ganador: " + ganador.getNombre());
         }
-        System.out.println(e1.getNombre() + " gano " + e1.getRondasGanadas() + " rondas");
-        System.out.println(e2.getNombre() + " gano " + e2.getRondasGanadas() + " rondas");
-        System.out.println("==========================================");
+        System.out.println(e1.getNombre() + " ganó " + e1.getRondasGanadas() + " rondas");
+        System.out.println(e2.getNombre() + " ganó " + e2.getRondasGanadas() + " rondas");
     }
 
     public void mostrarMensaje(String mensaje) {
