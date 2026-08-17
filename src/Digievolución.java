@@ -1,13 +1,13 @@
 import java.util.Random;
 
-public class Digievolución {
+public class Digievolucion {
     private String nombre;
     private String tipoEfecto;
     private int valorEfecto;
     private int probabilidad;
     private int duración;
 
-    public Digievolución(String nombre, String tipoEfecto, int valorEfecto, int probabilidad) {
+    public Digievolucion(String nombre, String tipoEfecto, int valorEfecto, int probabilidad) {
         this.nombre = nombre;
         this.tipoEfecto = tipoEfecto;
         this.valorEfecto = valorEfecto;
@@ -20,7 +20,7 @@ public class Digievolución {
         int numeroAleatorio = random.nextInt(101); 
         boolean efectoActivado = numeroAleatorio <= probabilidad;
         if (efectoActivado){
-            duración=4;
+            duración = 4;
         }
         return efectoActivado;
     }
