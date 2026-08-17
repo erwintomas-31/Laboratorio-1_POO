@@ -4,14 +4,14 @@ public class Digimon {
     private int ataque;
     private int defensa;
     private boolean usadoRonda;
-    private Digievolución digievolución;
+    private Digievolucion digievolución;
 
-    public Digimon(String nombre, String tipo, int ataque, int defensa) {
+    public Digimon(String nombre, String tipo, int ataque, int defensa, Digievolucion digievolución) {
         this.nombre = nombre;
         this.tipo = tipo;
         this.ataque = ataque;
         this.defensa = defensa;
-        this.usadoRonda = false;
+        this.digievolución = digievolución;
     }
 
     public void marcarUsado() {
@@ -38,13 +38,16 @@ public class Digimon {
         return defensa;
     }
 
-    public Digievolución getDigievolución() {
+    public Digievolucion getDigievolución() {
+        return digievolución;
+    }
+
+    public Digievolucion getDigievolucion() {
         return digievolución;
     }
 
     @Override
     public String toString() {
-        return "Digimon{" + "nombre='" + nombre + ", tipo='" + tipo + ", ataque=" + ataque + ", defensa=" + defensa + '}';
+        return "Digimon{" + "nombre='" + nombre + "', tipo='" + tipo + "', ataque=" + ataque + ", defensa=" + defensa + '}';
     }
-
 }
