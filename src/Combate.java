@@ -8,6 +8,14 @@ public class Combate {
     private int penalizacionPendiente1;
     private int penalizacionPendiente2;
 
+    public void iniciarBatalla() {
+        rondaActual = 0;
+        bonusPendiente1 = 0;
+        bonusPendiente2 = 0;
+        penalizacionPendiente1 = 0;
+        penalizacionPendiente2 = 0;
+    }
+
     public Combate(Entrenador entrenador1, Entrenador entrenador2, Main main) {
         this.entrenador1 = entrenador1;
         this.entrenador2 = entrenador2;
@@ -35,10 +43,9 @@ public class Combate {
     public int calcularAtaqueTotal(Digimon atacante, Digimon defensor, boolean usoHab) {
         int total = atacante.getAtaque();
         total += calcularEfectoTipo(atacante.getTipo(), defensor.getTipo());
-
         if (usoHab) {
-            Digievolución evo = atacante.getDigievolución();
-            if (evo.intentarActivacion() && evo.getTipoEfecto().equalsIgnoreCase("ataque")) {
+            Digievolucion evo = atacante.getDigievolución();
+            if (evo.aplicarEfecto(atacante) && evo.getTipoEfecto().equalsIgnoreCase("ataque")) {
                 total += evo.getValorEfecto();
             }
         }
@@ -61,18 +68,18 @@ public class Combate {
         penalizacionPendiente2 = 0;
 
         if (usoHab1 && d1.getDigievolución().efectoActivo()) {
-            Digievolución evo = d1.getDigievolución();
+            Digievolucion evo = d1.getDigievolución();
             if (!evo.getTipoEfecto().equalsIgnoreCase("ataque")) {
                 total2 -= evo.getValorEfecto();
                 penalizacionPendiente2 = evo.getValorEfecto();
             } else {
                 bonusPendiente1 = evo.getValorEfecto();
             }
-            evo.reducirDuracion();
+            evo.reducirDuración();
         }
 
         if (usoHab2 && d2.getDigievolución().efectoActivo()) {
-            Digievolución evo = d2.getDigievolución();
+            Digievolucion evo = d2.getDigievolución();
             if (!evo.getTipoEfecto().equalsIgnoreCase("ataque")) {
                 total1 -= evo.getValorEfecto();
                 penalizacionPendiente1 = evo.getValorEfecto();
@@ -83,11 +90,10 @@ public class Combate {
         }
 
         StringBuilder resultado = new StringBuilder();
-        resultado.append("Ronda ").append(rondaActual).append(": ")
-                .append(entrenador1.getNombre()).append(" usa ").append(d1.getNombre())
+        resultado.append("Ronda ").append(rondaActual).append(": ").append(entrenador1.getNombre()).append(" usa ").append(d1.getNombre())
                 .append(" (ataqueTotal=").append(total1).append(") vs ")
                 .append(entrenador2.getNombre()).append(" usa ").append(d2.getNombre())
-                .append(" (ataqueTotal=").append(total2).append("). ");
+                .append(" (ataqueTotal=").append(total2).append(")\n");
 
         if (total1 > total2) {
             entrenador1.sumarRondaGanada();
@@ -98,7 +104,6 @@ public class Combate {
         } else {
             resultado.append("Empate en esta ronda");
         }
-
         return resultado.toString();
     }
 
@@ -108,12 +113,10 @@ public class Combate {
         } else if (entrenador2.getRondasGanadas() > entrenador1.getRondasGanadas()) {
             return entrenador2;
         }
-        return null; // empate
+        return null;
     }
 
     public int getRondaActual() {
         return rondaActual;
     }
 }
-
-
